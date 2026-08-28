@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "texas-business-worth",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "48f273b9-28d4-47c4-ba05-646843beab68",
       "migrations_dir": "migrations"
     }
   ],
