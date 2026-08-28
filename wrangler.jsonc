@@ -31,7 +31,7 @@
   "vars": {
     "MODEL_VERSION": "TBW-1.0",
     "BENCHMARK_VERSION": "2026-Q3-seed",
-    "TURNSTILE_SITE_KEY": ""
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAEfscj2KB5MtmON6"
   },
   "triggers": {
     "crons": ["15 8 * * 1"]
