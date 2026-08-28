@@ -1,0 +1,24 @@
+{
+  "benchmarks": [
+    {
+      "sector": "home_services",
+      "label": "Residential HVAC",
+      "naics": "238220",
+      "geography": "austin",
+      "revenue_min": 1000000,
+      "revenue_max": 5000000,
+      "earnings_min": 150000,
+      "earnings_max": 1200000,
+      "sde_low": 3.1,
+      "sde_high": 4.0,
+      "ebitda_low": 4.2,
+      "ebitda_high": 5.5,
+      "revenue_low": 0.6,
+      "revenue_high": 0.95,
+      "source_name": "Licensed Provider Name",
+      "source_url": "https://provider.example",
+      "sample_size": 47,
+      "effective_date": "2026-Q2"
+    }
+  ]
+}
