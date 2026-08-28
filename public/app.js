@@ -30,11 +30,13 @@ async function boot() {
       Object.assign(state, parsed, { config: state.config, preferredContact: '', sellingIntent: '' });
     } catch (_) {}
   }
+  updateHeaderState();
 }
 
 function bindActions() {
   qsa('[data-action="start"]').forEach(b => b.addEventListener('click', startValuation));
   qsa('[data-action="restart"]').forEach(b => b.addEventListener('click', () => { sessionStorage.removeItem('tbw_state'); location.href='/'; }));
+  qsa('[data-action="sell"]').forEach(b => b.addEventListener('click', openSellerPath));
 
   qsa('[data-field]').forEach(group => {
     group.addEventListener('click', e => {
@@ -65,6 +67,29 @@ function bindActions() {
     const el = qs(`#${id}`);
     el.addEventListener('input', () => { el.value = formatNumberInput(el.value); });
   });
+}
+
+function updateHeaderState() {
+  const btn = qs('#headerSellButton');
+  if (!btn) return;
+  const show = !qs('#result').classList.contains('hidden') || !qs('#refine').classList.contains('hidden') || !qs('#leadSection').classList.contains('hidden') || !qs('#success').classList.contains('hidden');
+  btn.classList.toggle('hidden', !show);
+}
+
+function openSellerPath(e) {
+  if (e) e.preventDefault();
+  if (!state.currentResult) {
+    startValuation();
+    return;
+  }
+  if (!state.refined) {
+    openRefinement();
+    return;
+  }
+  state.sellingIntent = state.sellingIntent || 'yes';
+  showSection('leadSection');
+  loadTurnstile();
+  qs('#leadSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 async function startValuation() {
@@ -291,8 +316,8 @@ function estimatePayload(refined) {
 }
 
 function selectButton(group, button) { qsa('button[data-value]',group).forEach(b=>b.classList.remove('selected')); button.classList.add('selected'); }
-function showOnly(id) { ['landing','wizard','result','refine','leadSection','success'].forEach(x => qs(`#${x}`)?.classList.toggle('hidden',x!==id)); }
-function showSection(id) { qs(`#${id}`).classList.remove('hidden'); }
+function showOnly(id) { ['landing','wizard','result','refine','leadSection','success'].forEach(x => qs(`#${x}`)?.classList.toggle('hidden',x!==id)); updateHeaderState(); }
+function showSection(id) { qs(`#${id}`).classList.remove('hidden'); updateHeaderState(); }
 function persist() {
   const safe = {...state}; delete safe.config; delete safe.prefill; delete safe.sellingIntent; delete safe.preferredContact;
   sessionStorage.setItem('tbw_state',JSON.stringify(safe));

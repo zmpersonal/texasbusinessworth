@@ -6,17 +6,24 @@
   <meta name="description" content="Estimate what your Texas business could be worth using earnings, industry, business quality and Texas market benchmarks.">
   <title>Texas Business Worth — What Could Your Business Sell For?</title>
   <meta name="theme-color" content="#0b1d35">
-  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
-  <link rel="apple-touch-icon" href="/assets/texas-business-worth-logo.jpg">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/texas-business-worth-logo.png">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Texas Business Worth home">
-      <span class="brand-logo"><img src="/assets/texas-business-worth-logo.jpg" alt="" width="52" height="48"></span>
+      <span class="brand-logo"><img src="/assets/texas-business-worth-logo.png" alt="" width="52" height="48"></span>
       <span class="brand-copy"><span class="brand-name">Texas Business Worth</span><small>Private Company Valuation Intelligence</small></span>
     </a>
-    <div class="header-trust"><span class="trust-dot"></span> Confidential · Texas calibrated</div>
+    <div class="header-actions">
+      <nav class="header-nav" aria-label="Primary">
+        <a href="/methodology.html">Methodology</a>
+        <a href="/privacy.html">Privacy</a>
+      </nav>
+      <div class="header-trust"><span class="trust-dot"></span> Confidential · Texas calibrated</div>
+      <button class="secondary header-sell hidden" id="headerSellButton" type="button" data-action="sell">Sell My Business</button>
+    </div>
   </header>
 
   <main>
@@ -150,7 +157,7 @@
       </div>
 
       <div id="step-calculating" class="step-card calculating hidden">
-        <div class="calc-orbit"><span></span><img src="/assets/texas-business-worth-logo.jpg" alt="" width="54" height="50"></div>
+        <div class="calc-orbit"><span></span><img src="/assets/texas-business-worth-logo.png" alt="" width="54" height="50"></div>
         <div class="eyebrow">BUILDING YOUR TEXAS ESTIMATE</div>
         <h2>Analyzing your business…</h2>
         <p class="calc-sub">Your valuation is being assembled from multiple checks rather than a single multiple.</p>
@@ -166,8 +173,18 @@
 
     <section id="result" class="result shell hidden">
       <div class="result-head">
-        <div><div class="eyebrow">YOUR ESTIMATED TEXAS MARKET VALUE</div><h2 id="resultRange">$0 – $0</h2><p>Estimated value range based on the information provided.</p></div>
-        <div class="confidence"><b id="confidenceValue">66%</b><span>estimate refinement</span></div>
+        <div>
+          <div class="eyebrow">YOUR ESTIMATED TEXAS MARKET VALUE</div>
+          <h2 id="resultRange">$0 – $0</h2>
+          <p>Estimated value range based on the information provided.</p>
+        </div>
+        <div class="result-head-side">
+          <div class="result-actions">
+            <a class="ghost nav-link" href="/methodology.html">Methodology</a>
+            <button class="secondary" id="resultSellButton" type="button" data-action="sell">Sell My Business</button>
+          </div>
+          <div class="confidence"><b id="confidenceValue">66%</b><span>estimate refinement</span></div>
+        </div>
       </div>
 
       <div class="valuation-track"><div class="track-line"><span id="trackFill"></span><i></i></div><div class="track-labels"><span id="trackLow"></span><b id="trackLikely"></b><span id="trackHigh"></span></div></div>
