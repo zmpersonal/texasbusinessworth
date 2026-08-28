@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Estimate what your Texas business could be worth using earnings, industry, business quality and Texas market benchmarks.">
+  <title>Texas Business Worth — What Could Your Business Sell For?</title>
+  <meta name="theme-color" content="#0b1d35">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/texas-business-worth-logo.png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Texas Business Worth home">
+      <span class="brand-logo"><img src="/assets/texas-business-worth-logo.png" alt="" width="52" height="48"></span>
+      <span class="brand-copy"><span class="brand-name">Texas Business Worth</span><small>Private Company Valuation Intelligence</small></span>
+    </a>
+    <div class="header-actions">
+      <nav class="header-nav" aria-label="Primary">
+        <a href="/methodology.html">Methodology</a>
+        <a href="/privacy.html">Privacy</a>
+      </nav>
+      <div class="header-trust"><span class="trust-dot"></span> Confidential · Texas calibrated</div>
+      <button class="secondary header-sell hidden" id="headerSellButton" type="button" data-action="sell">Sell My Business</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="landing" class="landing shell">
+      <div class="hero-copy">
+        <div class="eyebrow">TEXAS PRIVATE COMPANY VALUATION</div>
+        <h1>Know what your business may be worth <em>before</em> you enter a sale process.</h1>
+        <p class="hero-sub">A confidential, Texas-market-adjusted estimate built from earnings, industry benchmarks, growth and the business-quality factors buyers underwrite.</p>
+        <div class="model-status"><span>TBW Valuation Engine</span><i></i><span>Texas market calibrated</span><i></i><span>Methodology disclosed</span></div>
+        <div class="hero-actions">
+          <button class="primary large" data-action="start">Estimate My Business Value <span>→</span></button>
+          <span class="time-note">About 90 seconds · No personal contact info required</span>
+        </div>
+        <div class="trust-row">
+          <div><strong>Texas focused</strong><span>Austin · DFW · Houston · San Antonio</span></div>
+          <div><strong>Explainable methodology</strong><span>Earnings multiples + revenue reasonableness check</span></div>
+          <div><strong>Private</strong><span>No contact info required for your estimate</span></div>
+        </div>
+      </div>
+
+      <aside class="hero-card" aria-label="Sample valuation preview">
+        <div class="hero-card-top"><div><div class="mini-label">SAMPLE TEXAS VALUATION</div><small>Illustrative private-company report</small></div><span class="report-badge">CONFIDENTIAL</span></div>
+        <div class="sample-value">$2.7M <span>–</span> $3.2M</div>
+        <div class="sample-caption">Estimated market range</div>
+        <div class="range-line"><span></span><i></i></div>
+        <div class="metric-grid">
+          <div><small>Market</small><b>Austin–Round Rock</b></div>
+          <div><small>Method</small><b>SDE + revenue check</b></div>
+          <div><small>Marketability</small><b class="good">Highly Marketable</b></div>
+          <div><small>Estimate quality</small><b>86% refined</b></div>
+        </div>
+        <div class="sample-driver"><span class="up">↑</span><div><b>Strong recurring revenue</b><small>Supports a premium to the base range</small></div></div>
+        <div class="sample-driver"><span class="down">↓</span><div><b>Owner dependence</b><small>Limits transferability to a new buyer</small></div></div>
+      </aside>
+    </section>
+
+    <section class="proof-band">
+      <div class="shell proof-grid">
+        <div><span>01</span><strong>Your numbers</strong><small>Revenue + owner earnings / EBITDA</small></div>
+        <div><span>02</span><strong>Texas market</strong><small>Metro + industry calibration</small></div>
+        <div><span>03</span><strong>Business quality</strong><small>Growth, recurring revenue + transferability</small></div>
+        <div><span>04</span><strong>Your range</strong><small>Transparent estimate + value drivers</small></div>
+      </div>
+    </section>
+
+    <section id="wizard" class="wizard shell hidden" aria-live="polite">
+      <div class="wizard-top">
+        <button class="text-button hidden" id="backButton" type="button">← Back</button>
+        <div class="progress-wrap"><div class="progress-bar"><span id="progressBar"></span></div><div id="progressText">Step 1 of 4</div></div>
+        <div class="privacy-mini">Private & confidential</div>
+      </div>
+
+      <div id="step-location" class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <div class="eyebrow">START WITH THE BASICS</div>
+          <h2>Where is the business located?</h2>
+          <p>Texas markets are calibrated separately when reliable regional data is available.</p>
+          <div class="choice-grid metro-grid" data-field="metro">
+            <button data-value="austin"><b>Austin</b><small>Austin–Round Rock</small></button>
+            <button data-value="dfw"><b>Dallas–Fort Worth</b><small>DFW Metroplex</small></button>
+            <button data-value="houston"><b>Houston</b><small>Greater Houston</small></button>
+            <button data-value="san_antonio"><b>San Antonio</b><small>Greater San Antonio</small></button>
+            <button data-value="texas_other" class="wide"><b>Elsewhere in Texas</b><small>Statewide calibration</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-industry" class="step-card hidden">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <div class="eyebrow">BUSINESS TYPE</div>
+          <h2>What kind of business do you own?</h2>
+          <p>Choose the closest category. You can type the exact business type underneath.</p>
+          <div class="choice-grid industry-grid" data-field="sector">
+            <button data-value="home_services"><b>Home & Trade Services</b><small>HVAC, plumbing, roofing, electrical, landscaping, pest</small></button>
+            <button data-value="construction"><b>Construction</b><small>GCs, specialty contractors, commercial trades</small></button>
+            <button data-value="professional"><b>Professional Services</b><small>Accounting, consulting, agencies, legal services</small></button>
+            <button data-value="healthcare"><b>Healthcare Services</b><small>Practices, clinics, home health, therapy</small></button>
+            <button data-value="manufacturing"><b>Manufacturing</b><small>Fabrication, industrial, specialty products</small></button>
+            <button data-value="distribution"><b>Distribution & Wholesale</b><small>Wholesale, supply, logistics distribution</small></button>
+            <button data-value="software"><b>Software & IT</b><small>SaaS, MSP, technology services</small></button>
+            <button data-value="retail"><b>Retail</b><small>Stores, ecommerce, specialty retail</small></button>
+            <button data-value="hospitality"><b>Hospitality & Food</b><small>Restaurants, catering, lodging</small></button>
+            <button data-value="other"><b>Other</b><small>Use the description below</small></button>
+          </div>
+          <label class="field-label" for="industryLabel">Describe the business <span>optional but recommended</span></label>
+          <input id="industryLabel" class="text-input" maxlength="160" placeholder="e.g. Residential HVAC contractor">
+          <button class="primary next" id="industryNext" type="button" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <div id="step-financials" class="step-card hidden">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <div class="eyebrow">FINANCIAL PROFILE</div>
+          <h2>What does the business generate?</h2>
+          <p>Approximate numbers are fine. Exact numbers produce a tighter estimate.</p>
+          <div class="financial-fields">
+            <label>Annual revenue
+              <span class="money-input"><i>$</i><input id="revenue" inputmode="numeric" autocomplete="off" placeholder="3,500,000"></span>
+            </label>
+            <label>Annual earnings
+              <span class="money-input"><i>$</i><input id="earnings" inputmode="numeric" autocomplete="off" placeholder="650,000"></span>
+            </label>
+          </div>
+          <div class="segmented" data-field="earningsType">
+            <button data-value="sde" class="selected"><b>Owner Earnings / SDE</b><small>Best for owner-operated businesses</small></button>
+            <button data-value="ebitda"><b>EBITDA</b><small>Best for larger managed companies</small></button>
+          </div>
+          <details class="explainer"><summary>Which earnings number should I use?</summary><p><b>SDE</b> generally means pre-tax profit plus owner compensation and certain owner-specific add-backs. <b>EBITDA</b> is earnings before interest, taxes, depreciation and amortization. Use the figure you track most reliably.</p></details>
+          <button class="primary next" id="financialNext" type="button">Continue →</button>
+          <p class="inline-error" id="financialError"></p>
+        </div>
+      </div>
+
+      <div id="step-growth" class="step-card hidden">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <div class="eyebrow">RECENT PERFORMANCE</div>
+          <h2>How has revenue changed over the last 3 years?</h2>
+          <div class="choice-list" data-field="growth">
+            <button data-value="grow_20_plus"><b>Growing more than 20% / year</b><span>→</span></button>
+            <button data-value="grow_10_20"><b>Growing 10–20% / year</b><span>→</span></button>
+            <button data-value="grow_1_10"><b>Growing 1–10% / year</b><span>→</span></button>
+            <button data-value="flat"><b>About flat</b><span>→</span></button>
+            <button data-value="declining_minor"><b>Down slightly</b><span>→</span></button>
+            <button data-value="declining_major"><b>Down significantly</b><span>→</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-calculating" class="step-card calculating hidden">
+        <div class="calc-orbit"><span></span><img src="/assets/texas-business-worth-logo.png" alt="" width="54" height="50"></div>
+        <div class="eyebrow">BUILDING YOUR TEXAS ESTIMATE</div>
+        <h2>Analyzing your business…</h2>
+        <p class="calc-sub">Your valuation is being assembled from multiple checks rather than a single multiple.</p>
+        <ul id="calcList">
+          <li class="active">Matching your industry and NAICS peer set</li>
+          <li>Calibrating Texas and metro benchmarks</li>
+          <li>Testing earnings against revenue</li>
+          <li>Weighting growth and marketability</li>
+          <li>Building your valuation range</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="result" class="result shell hidden">
+      <div class="result-head">
+        <div>
+          <div class="eyebrow">YOUR ESTIMATED TEXAS MARKET VALUE</div>
+          <h2 id="resultRange">$0 – $0</h2>
+          <p>Estimated value range based on the information provided.</p>
+        </div>
+        <div class="result-head-side">
+          <div class="result-actions">
+            <a class="ghost nav-link" href="/methodology.html">Methodology</a>
+            <button class="secondary" id="resultSellButton" type="button" data-action="sell">Sell My Business</button>
+          </div>
+          <div class="confidence"><b id="confidenceValue">66%</b><span>estimate refinement</span></div>
+        </div>
+      </div>
+
+      <div class="valuation-track"><div class="track-line"><span id="trackFill"></span><i></i></div><div class="track-labels"><span id="trackLow"></span><b id="trackLikely"></b><span id="trackHigh"></span></div></div>
+
+      <div class="result-grid">
+        <article class="result-panel">
+          <div class="panel-title"><span>VALUATION</span><small id="marketLabel">Texas</small></div>
+          <div class="key-stat"><small>Adjusted multiple</small><b id="multipleRange">—</b></div>
+          <div class="key-stat"><small>Primary method</small><b id="methodType">—</b></div>
+          <div class="key-stat"><small>Industry</small><b id="industryResult">—</b></div>
+          <div class="benchmark-note" id="benchmarkNote">Benchmark source: Texas Business Worth seed model</div>
+        </article>
+
+        <article class="result-panel drivers">
+          <div class="panel-title"><span>WHAT IS MOVING YOUR VALUE</span></div>
+          <div id="driversList"></div>
+        </article>
+      </div>
+
+      <div id="refineCta" class="refine-cta">
+        <div class="refine-score"><b>66%</b><span>refined</span></div>
+        <div><h3>Make your estimate more accurate.</h3><p>Add your business details and five quality factors buyers commonly underwrite.</p></div>
+        <button class="primary" id="refineButton">Refine My Estimate →</button>
+      </div>
+
+      <div id="refinedModules" class="hidden">
+        <div class="result-grid refined-grid">
+          <article class="score-card">
+            <div class="panel-title"><span>TEXAS BUYER ATTRACTIVENESS</span></div>
+            <div class="score-ring"><b id="buyerScore">—</b><small>/ 100</small></div>
+            <h3 id="buyerLabel">—</h3>
+            <p>A directional measure of transferability, predictability and buyer appeal based on your answers.</p>
+          </article>
+          <article class="gap-card">
+            <div class="panel-title"><span>POTENTIAL VALUE GAP</span></div>
+            <div class="gap-numbers"><span><small>Current upper estimate</small><b id="gapCurrent">—</b></span><i>→</i><span><small>Potential upper value</small><b id="gapPotential">—</b></span></div>
+            <div class="gap-increase">Potential improvement <b id="gapIncrease">—</b></div>
+            <div id="opportunityList" class="opportunity-list"></div>
+          </article>
+        </div>
+
+        <div class="intent-card" id="intentCard">
+          <div class="intent-icon">★</div>
+          <div><div class="eyebrow">ONE LAST QUESTION</div><h3 id="intentQuestion">Would you consider selling if you could get an offer within this range?</h3><p>This does not list your business or share your information with buyers.</p></div>
+          <div class="intent-buttons">
+            <button class="primary" data-intent="yes">Yes</button>
+            <button class="secondary" data-intent="maybe">Possibly</button>
+            <button class="ghost" data-intent="not_now">Not right now</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer">This is an informational estimate, not an appraisal, fairness opinion, offer, tax opinion or investment advice. Actual value depends on verified financials, deal structure, working capital, buyer demand and due diligence.</p>
+    </section>
+
+    <section id="refine" class="wizard shell hidden">
+      <div class="wizard-top">
+        <button class="text-button" id="refineBack" type="button">← Back to estimate</button>
+        <div class="progress-wrap"><div class="progress-bar"><span style="width:80%"></span></div><div>Refining your estimate</div></div>
+        <div class="privacy-mini">No personal contact info required</div>
+      </div>
+      <div class="step-card">
+        <div class="step-number">+</div>
+        <div class="step-content">
+          <div class="eyebrow">BUSINESS QUALITY</div>
+          <h2>Build the more complete estimate.</h2>
+          <p>Business identity stays confidential. These details make the report more useful if you later request a sale conversation.</p>
+
+          <div class="identity-panel">
+            <div class="identity-head"><span>CONFIDENTIAL BUSINESS DETAILS</span><small>Not shown publicly</small></div>
+            <div class="identity-fields">
+              <label>Business name<input id="businessName" class="text-input" maxlength="160" autocomplete="organization" placeholder="e.g. Hill Country Mechanical"></label>
+              <label>Business address<input id="businessAddress" class="text-input" maxlength="240" autocomplete="street-address" placeholder="Street, city, TX ZIP"></label>
+            </div>
+            <label class="target-price">Sale price you would seriously consider <span>optional</span><span class="money-input"><i>$</i><input id="targetSalePrice" inputmode="numeric" autocomplete="off" placeholder="3,000,000"></span><small>If blank, buyer-financing analysis uses the model's most-likely value.</small></label>
+          </div>
+
+          <fieldset><legend>1. How much revenue is recurring or from repeat customers?</legend><div class="pill-row" data-field="recurring"><button data-value="none">Almost none</button><button data-value="low">Under 25%</button><button data-value="medium">25–50%</button><button data-value="high">50–75%</button><button data-value="very_high">75%+</button></div></fieldset>
+          <fieldset><legend>2. What percentage of revenue comes from your largest customer?</legend><div class="pill-row" data-field="customerConcentration"><button data-value="under_10">Under 10%</button><button data-value="10_25">10–25%</button><button data-value="25_50">25–50%</button><button data-value="over_50">Over 50%</button></div></fieldset>
+          <fieldset><legend>3. If you stopped working tomorrow, what would happen?</legend><div class="stack-row" data-field="ownerDependence"><button data-value="normal">Business could operate normally</button><button data-value="manageable">Management could run most of it</button><button data-value="difficult">Employees could manage with difficulty</button><button data-value="high">Revenue / operations would decline significantly</button><button data-value="essential">The business largely depends on me</button></div></fieldset>
+          <fieldset><legend>4. Does someone besides you manage day-to-day operations?</legend><div class="pill-row" data-field="management"><button data-value="yes">Yes</button><button data-value="partial">Partially</button><button data-value="none">No</button></div></fieldset>
+          <fieldset><legend>5. How long has the business operated?</legend><label class="years-input"><input id="yearsOperating" type="number" min="1" max="100" placeholder="12"><span>years</span></label></fieldset>
+
+          <button class="primary next" id="recalculateButton">Update My Valuation →</button>
+          <p class="inline-error" id="refineError"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="leadSection" class="lead-section shell hidden">
+      <div class="lead-card">
+        <div class="lead-copy"><div class="eyebrow">CONFIDENTIAL CONVERSATION</div><h2>See what an actual buyer might pay.</h2><p>If you are open to selling, request a confidential conversation about your business, likely buyer interest and what a transaction could look like.</p><ul><li>No obligation to sell</li><li>Your business is not publicly listed</li><li>Your information is not sent to buyers automatically</li></ul></div>
+        <form id="leadForm">
+          <label>Full name<input id="fullName" autocomplete="name" required></label>
+          <label>Email<input id="email" type="email" autocomplete="email" required></label>
+          <label>Phone <span>optional if email preferred</span><input id="phone" type="tel" autocomplete="tel"></label>
+          <label>Preferred contact<div class="form-pills" data-field="preferredContact"><button type="button" data-value="phone">Phone</button><button type="button" data-value="text">Text</button><button type="button" data-value="email">Email</button></div></label>
+          <label>When might you consider a sale?<select id="saleTiming" required><option value="">Select one</option><option value="now">Now, if the price is right</option><option value="within_6">Within 6 months</option><option value="6_12">6–12 months</option><option value="1_3">1–3 years</option><option value="exploring">Just exploring</option></select></label>
+          <div id="turnstileMount"></div>
+          <button class="primary large full" type="submit">Request a Confidential Conversation →</button>
+          <p class="form-note">By submitting, you are asking Texas Business Worth to contact you about a potential business sale. This is not consent to publicly market or list your company.</p>
+          <p class="inline-error" id="leadError"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="success" class="success shell hidden">
+      <div class="success-card"><div class="success-check">✓</div><div class="eyebrow">REQUEST RECEIVED</div><h2>Your information has been submitted confidentially.</h2><p>Someone can review the valuation and the information you provided before contacting you by your preferred method.</p><button class="secondary" data-action="restart">Run Another Valuation</button></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner"><div><b>Texas Business Worth</b><span>Private-company valuation estimates for Texas business owners.</span></div><nav><a href="/methodology.html">Methodology</a><a href="/privacy.html">Privacy</a></nav></div>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
