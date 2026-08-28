@@ -1,0 +1,5 @@
+# Never commit real secrets. Copy this file to .dev.vars for local development.
+TURNSTILE_SECRET_KEY=
+CRM_WEBHOOK_URL=
+CRM_WEBHOOK_SECRET=
+ADMIN_IMPORT_KEY=
