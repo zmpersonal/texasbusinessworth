@@ -2,6 +2,7 @@ const state = {
   sessionId: null,
   valuationId: null,
   metro: '', sector: '', industryLabel: '', naics: '',
+  businessName: '', businessAddress: '', targetSalePrice: 0,
   revenue: 0, earnings: 0, earningsType: 'sde', growth: '',
   refined: false,
   recurring: '', customerConcentration: '', ownerDependence: '', management: '', yearsOperating: '',
@@ -60,7 +61,7 @@ function bindActions() {
   qsa('[data-intent]').forEach(b => b.addEventListener('click', () => handleIntent(b.dataset.intent)));
   qs('#leadForm').addEventListener('submit', submitLead);
 
-  ['revenue','earnings'].forEach(id => {
+  ['revenue','earnings','targetSalePrice'].forEach(id => {
     const el = qs(`#${id}`);
     el.addEventListener('input', () => { el.value = formatNumberInput(el.value); });
   });
@@ -90,6 +91,7 @@ function applyPrefill() {
   if (state.prefill.sector) state.sector = state.prefill.sector;
   if (state.prefill.industryLabel) state.industryLabel = state.prefill.industryLabel;
   if (state.prefill.naics) state.naics = state.prefill.naics;
+  if (state.prefill.companyName) state.businessName = state.prefill.companyName;
 }
 
 function afterSelection(field) {
@@ -117,6 +119,10 @@ function syncSelections() {
   if (state.industryLabel) qs('#industryLabel').value = state.industryLabel;
   if (state.revenue) qs('#revenue').value = comma(state.revenue);
   if (state.earnings) qs('#earnings').value = comma(state.earnings);
+  if (qs('#businessName') && state.businessName) qs('#businessName').value = state.businessName;
+  if (qs('#businessAddress') && state.businessAddress) qs('#businessAddress').value = state.businessAddress;
+  if (qs('#targetSalePrice') && state.targetSalePrice) qs('#targetSalePrice').value = comma(state.targetSalePrice);
+  if (qs('#yearsOperating') && state.yearsOperating) qs('#yearsOperating').value = state.yearsOperating;
   qs('#industryNext').disabled = !state.sector;
 }
 
@@ -154,10 +160,16 @@ function showCalculating() {
 
 async function animateCalculation() {
   const items = qsa('#calcList li');
+  const started = performance.now();
+  const minimumMs = 4000;
+  const stepMs = Math.floor(3500 / Math.max(1, items.length));
+  items.forEach(el => el.classList.remove('done'));
   for (let i=0;i<items.length;i++) {
     items.forEach((el,j) => { el.classList.toggle('active',j===i); if(j<i) el.classList.add('done'); });
-    await sleep(260);
+    await sleep(stepMs);
   }
+  const elapsed = performance.now() - started;
+  if (elapsed < minimumMs) await sleep(minimumMs - elapsed);
   items.forEach(el => { el.classList.remove('active'); el.classList.add('done'); });
 }
 
@@ -201,10 +213,13 @@ function openRefinement() {
 }
 
 async function submitRefinement() {
+  state.businessName = qs('#businessName').value.trim();
+  state.businessAddress = qs('#businessAddress').value.trim();
+  state.targetSalePrice = parseMoney(qs('#targetSalePrice').value);
   state.yearsOperating = qs('#yearsOperating').value;
-  const required = ['recurring','customerConcentration','ownerDependence','management','yearsOperating'];
+  const required = ['businessName','businessAddress','recurring','customerConcentration','ownerDependence','management','yearsOperating'];
   const missing = required.filter(k => !state[k]);
-  if (missing.length) return qs('#refineError').textContent='Complete all five questions to update the estimate.';
+  if (missing.length) return qs('#refineError').textContent='Add the business name and address, then complete all five questions.';
   qs('#refineError').textContent='';
   qs('#recalculateButton').disabled=true; qs('#recalculateButton').textContent='Updating valuation…';
   try {
@@ -245,6 +260,7 @@ async function submitLead(e) {
     await api('/api/lead',{method:'POST',body:{
       sessionId:state.sessionId, sellingIntent:state.sellingIntent,
       fullName:qs('#fullName').value.trim(), email, phone,
+      businessName:state.businessName, businessAddress:state.businessAddress, targetSalePrice:state.targetSalePrice || 0,
       preferredContact:state.preferredContact, saleTiming:qs('#saleTiming').value,
       turnstileToken
     }});
@@ -270,7 +286,7 @@ function estimatePayload(refined) {
     industryLabel:state.industryLabel || sectorLabel(state.sector), naics:state.naics || '',
     revenue:state.revenue, earnings:state.earnings, earningsType:state.earningsType,
     growth:state.growth, refined,
-    ...(refined ? { recurring:state.recurring, customerConcentration:state.customerConcentration, ownerDependence:state.ownerDependence, management:state.management, yearsOperating:Number(state.yearsOperating) } : {})
+    ...(refined ? { businessName:state.businessName, businessAddress:state.businessAddress, targetSalePrice:Number(state.targetSalePrice)||0, recurring:state.recurring, customerConcentration:state.customerConcentration, ownerDependence:state.ownerDependence, management:state.management, yearsOperating:Number(state.yearsOperating) } : {})
   };
 }
 

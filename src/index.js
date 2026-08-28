@@ -132,7 +132,7 @@ export default {
 
         const leadId = crypto.randomUUID();
         const valuation = await env.DB.prepare(`
-          SELECT id, value_low, value_high, sector, metro, revenue, earnings, earnings_type
+          SELECT id, value_low, value_high, multiple_low, multiple_high, sector, industry_label, naics, metro, revenue, earnings, earnings_type, growth, inputs_json, result_json
           FROM valuation_results
           WHERE session_id=? ORDER BY created_at DESC LIMIT 1
         `).bind(body.sessionId).first();
@@ -159,22 +159,12 @@ export default {
 
         await recordEvent(env, body.sessionId, 'contact_completed', { leadId, score });
 
-        if (env.CRM_WEBHOOK_URL) {
-          ctx.waitUntil(sendToCrm(env, {
-            event: 'seller_lead.created',
-            lead: {
-              id: leadId,
-              name: safeText(body.fullName, 120),
-              email: normalizeEmail(body.email),
-              phone: normalizePhone(body.phone),
-              preferredContact: body.preferredContact,
-              sellingIntent: body.sellingIntent,
-              saleTiming: body.saleTiming,
-              leadScore: score
-            },
-            valuation: valuation || null
-          }));
-        }
+        const deliveryPayload = buildLeadDeliveryPayload(body, valuation, leadId, score);
+        const deliveries = [];
+        if (env.CRM_WEBHOOK_URL) deliveries.push(sendToCrm(env, deliveryPayload));
+        if (env.SLACK_WEBHOOK_URL) deliveries.push(sendToSlack(env, deliveryPayload));
+        if (env.GOOGLE_SHEETS_WEBHOOK_URL) deliveries.push(sendToGoogleSheets(env, deliveryPayload));
+        if (deliveries.length) ctx.waitUntil(Promise.allSettled(deliveries));
 
         return json({ ok: true, leadId });
       }
@@ -236,6 +226,10 @@ function validateLead(body) {
   if (!['now','within_6','6_12','1_3','exploring'].includes(body.saleTiming)) throw httpError(400, 'Select a timeline');
   if (!['phone','text','email'].includes(body.preferredContact)) throw httpError(400, 'Select a preferred contact method');
   if (!safeText(body.fullName, 120) || safeText(body.fullName, 120).length < 2) throw httpError(400, 'Enter your name');
+  if (!safeText(body.businessName, 160) || safeText(body.businessName, 160).length < 2) throw httpError(400, 'Enter the business name');
+  if (!safeText(body.businessAddress, 240) || safeText(body.businessAddress, 240).length < 4) throw httpError(400, 'Enter the business address');
+  const targetSalePrice = Number(body.targetSalePrice || 0);
+  if (!Number.isFinite(targetSalePrice) || targetSalePrice < 0 || targetSalePrice > 500000000) throw httpError(400, 'Check the target sale price');
   if (!/^\S+@\S+\.\S+$/.test(normalizeEmail(body.email))) throw httpError(400, 'Enter a valid email');
   if (body.preferredContact !== 'email' && normalizePhone(body.phone).replace(/\D/g,'').length < 10) throw httpError(400, 'Enter a valid phone number');
 }
@@ -299,6 +293,158 @@ async function sendToCrm(env, payload) {
   const response = await fetch(env.CRM_WEBHOOK_URL, { method: 'POST', headers, body: JSON.stringify(payload) });
   if (!response.ok) throw new Error(`CRM webhook returned ${response.status}`);
 }
+
+async function sendToGoogleSheets(env, payload) {
+  const body = env.GOOGLE_SHEETS_WEBHOOK_SECRET ? { ...payload, sheetSecret: env.GOOGLE_SHEETS_WEBHOOK_SECRET } : payload;
+  const response = await fetch(env.GOOGLE_SHEETS_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) throw new Error(`Google Sheets webhook returned ${response.status}`);
+  const result = await response.json().catch(() => ({ ok:true }));
+  if (result && result.ok === false) throw new Error(`Google Sheets webhook rejected lead: ${result.error || 'unknown error'}`);
+}
+
+async function sendToSlack(env, payload) {
+  const lead = payload.lead;
+  const business = payload.business;
+  const valuation = payload.valuation;
+  const finance = payload.acquisitionSnapshot;
+  const quality = business.quality || {};
+  const valueGap = valuation.valueGap || {};
+  const lines = [
+    `*Texas Business Worth — New Seller Lead*`,
+    `*Lead score:* ${lead.leadScore}/100  •  *Intent:* ${pretty(lead.sellingIntent)}  •  *Timing:* ${pretty(lead.saleTiming)}`,
+    '',
+    `*${slackSafe(business.name)}*`,
+    slackSafe(business.address),
+    `${slackSafe(business.industry)}  •  ${slackSafe(business.metro)}${business.naics ? `  •  NAICS ${slackSafe(business.naics)}` : ''}`,
+    `Revenue: *${usd(business.revenue)}*  •  ${String(business.earningsType || '').toUpperCase()}: *${usd(business.earnings)}*  •  Growth: *${pretty(business.growth)}*`,
+    `Recurring: ${pretty(quality.recurring)}  •  Largest customer: ${pretty(quality.customerConcentration)}  •  Management: ${pretty(quality.management)}  •  Owner dependence: ${pretty(quality.ownerDependence)}`,
+    '',
+    `*Valuation:* ${usd(valuation.low)} – ${usd(valuation.high)}${valuation.mostLikelyLow ? `  •  Most likely ${usd(valuation.mostLikelyLow)} – ${usd(valuation.mostLikelyHigh)}` : ''}`,
+    `Multiple: ${Number(valuation.multipleLow || 0).toFixed(2)}x – ${Number(valuation.multipleHigh || 0).toFixed(2)}x  •  Buyer score: ${valuation.buyerScore || '—'}${valueGap.potential ? `  •  Potential upper: ${usd(valueGap.potential)}` : ''}`,
+    '',
+    `*Default acquisition stress test:* ${finance.priceSource === 'seller_target' ? 'seller target price' : 'modeled most-likely price'} ${usd(finance.askingPrice)}`,
+    `10% down • 11.0% rate • 10 years • DSCR *${finance.dscr.toFixed(2)}x* • Annual debt ${usd(finance.annualDebt)} • Take-home ${usd(finance.takeHome)} • Cash-on-cash ${(finance.cashOnCash * 100).toFixed(0)}%`,
+    '',
+    `*Contact:* ${slackSafe(lead.name)}  •  ${slackSafe(lead.email)}${lead.phone ? `  •  ${slackSafe(lead.phone)}` : ''}  •  Prefers ${pretty(lead.preferredContact)}`
+  ];
+  const response = await fetch(env.SLACK_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ text: lines.join('\n') })
+  });
+  if (!response.ok) throw new Error(`Slack webhook returned ${response.status}`);
+}
+
+function buildLeadDeliveryPayload(body, valuation, leadId, score) {
+  const inputs = parseJson(valuation?.inputs_json) || {};
+  const result = parseJson(valuation?.result_json) || {};
+  const targetSalePrice = Number(body.targetSalePrice || inputs.targetSalePrice || 0);
+  const acquisitionSnapshot = buildAcquisitionSnapshot({
+    targetSalePrice,
+    valueLow: Number(valuation?.value_low || 0),
+    valueHigh: Number(valuation?.value_high || 0),
+    mostLikely: result.mostLikely,
+    cashFlow: Number(valuation?.earnings || 0),
+    earningsType: valuation?.earnings_type || ''
+  });
+  return {
+    event: 'seller_lead.created',
+    receivedAt: new Date().toISOString(),
+    lead: {
+      id: leadId,
+      name: safeText(body.fullName, 120),
+      email: normalizeEmail(body.email),
+      phone: normalizePhone(body.phone),
+      preferredContact: body.preferredContact,
+      sellingIntent: body.sellingIntent,
+      saleTiming: body.saleTiming,
+      leadScore: score
+    },
+    business: {
+      name: safeText(body.businessName || inputs.businessName, 160),
+      address: safeText(body.businessAddress || inputs.businessAddress, 240),
+      industry: safeText(valuation?.industry_label, 160) || sectorLabelServer(valuation?.sector),
+      sector: valuation?.sector || '',
+      naics: valuation?.naics || '',
+      metro: metroLabelServer(valuation?.metro),
+      revenue: Number(valuation?.revenue || 0),
+      earnings: Number(valuation?.earnings || 0),
+      earningsType: valuation?.earnings_type || '',
+      growth: valuation?.growth || '',
+      yearsOperating: Number(inputs.yearsOperating || 0),
+      targetSalePrice,
+      quality: {
+        recurring: inputs.recurring || '',
+        customerConcentration: inputs.customerConcentration || '',
+        ownerDependence: inputs.ownerDependence || '',
+        management: inputs.management || ''
+      }
+    },
+    valuation: {
+      id: valuation?.id || null,
+      low: Number(valuation?.value_low || 0),
+      high: Number(valuation?.value_high || 0),
+      mostLikelyLow: Number(result?.mostLikely?.low || 0),
+      mostLikelyHigh: Number(result?.mostLikely?.high || 0),
+      multipleLow: Number(valuation?.multiple_low || 0),
+      multipleHigh: Number(valuation?.multiple_high || 0),
+      buyerScore: Number(result?.buyerScore?.score || 0),
+      buyerLabel: result?.buyerScore?.label || '',
+      confidence: Number(result?.confidence || 0),
+      valueGap: result?.valueGap || null
+    },
+    acquisitionSnapshot
+  };
+}
+
+function buildAcquisitionSnapshot({ targetSalePrice, valueLow, valueHigh, mostLikely, cashFlow, earningsType }) {
+  const modeled = Number(mostLikely?.low || 0) && Number(mostLikely?.high || 0)
+    ? (Number(mostLikely.low) + Number(mostLikely.high)) / 2
+    : (valueLow + valueHigh) / 2;
+  const askingPrice = targetSalePrice > 0 ? targetSalePrice : modeled;
+  const downPaymentPct = 0.10;
+  const interestRate = 0.11;
+  const loanTermYears = 10;
+  const workingCapitalReserve = 0;
+  const salaryDraw = 0;
+  const principal = Math.max(0, askingPrice * (1 - downPaymentPct));
+  const monthlyRate = interestRate / 12;
+  const periods = loanTermYears * 12;
+  const monthlyPI = principal > 0 ? principal * monthlyRate / (1 - Math.pow(1 + monthlyRate, -periods)) : 0;
+  const annualDebt = monthlyPI * 12;
+  const takeHome = Math.max(0, cashFlow - salaryDraw - annualDebt);
+  const cashAtClose = askingPrice * downPaymentPct + workingCapitalReserve;
+  return {
+    askingPrice: roundMoney(askingPrice),
+    priceSource: targetSalePrice > 0 ? 'seller_target' : 'modeled_most_likely',
+    cashFlow: roundMoney(cashFlow),
+    earningsType,
+    salaryDraw,
+    downPaymentPct,
+    interestRate,
+    loanTermYears,
+    workingCapitalReserve,
+    cashAtClose: roundMoney(cashAtClose),
+    monthlyPI: roundMoney(monthlyPI),
+    annualDebt: roundMoney(annualDebt),
+    dscr: annualDebt > 0 ? cashFlow / annualDebt : 0,
+    takeHome: roundMoney(takeHome),
+    cashOnCash: cashAtClose > 0 ? takeHome / cashAtClose : 0,
+    note: earningsType === 'sde' ? 'Illustrative buyer case using seller-entered SDE as cash flow.' : 'Illustrative buyer case using EBITDA as entered; buyer compensation/replacement management may need separate adjustment.'
+  };
+}
+
+function parseJson(value) { try { return value ? JSON.parse(value) : null; } catch { return null; } }
+function roundMoney(value) { return Math.round(Number(value || 0)); }
+function usd(value) { return `$${Math.round(Number(value || 0)).toLocaleString('en-US')}`; }
+function slackSafe(value) { return String(value || '—').replace(/[<>]/g, ''); }
+function pretty(value) { return String(value || '—').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+function sectorLabelServer(v) { return ({home_services:'Home & Trade Services',construction:'Construction & Specialty Contracting',professional:'Professional Services',healthcare:'Healthcare Services',manufacturing:'Manufacturing',distribution:'Distribution & Wholesale',retail:'Retail',software:'Software & IT Services',hospitality:'Hospitality & Food Service',other:'Other Privately Held Business'}[v] || 'Privately Held Business'); }
+function metroLabelServer(v) { return ({austin:'Austin–Round Rock',san_antonio:'San Antonio',houston:'Houston',dfw:'Dallas–Fort Worth',texas_other:'Texas'}[v] || 'Texas'); }
 
 function leadScore(body, valuation) {
   let score = 40;

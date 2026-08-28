@@ -5,36 +5,40 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Estimate what your Texas business could be worth using earnings, industry, business quality and Texas market benchmarks.">
   <title>Texas Business Worth — What Could Your Business Sell For?</title>
+  <meta name="theme-color" content="#0b1d35">
+  <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+  <link rel="apple-touch-icon" href="/assets/texas-business-worth-logo.jpg">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Texas Business Worth home">
-      <span class="brand-mark" aria-hidden="true"><span>★</span></span>
-      <span class="brand-name">Texas Business Worth</span>
+      <span class="brand-logo"><img src="/assets/texas-business-worth-logo.jpg" alt="" width="52" height="48"></span>
+      <span class="brand-copy"><span class="brand-name">Texas Business Worth</span><small>Private Company Valuation Intelligence</small></span>
     </a>
-    <div class="header-trust"><span class="lock">◆</span> Confidential estimate</div>
+    <div class="header-trust"><span class="trust-dot"></span> Confidential · Texas calibrated</div>
   </header>
 
   <main>
     <section id="landing" class="landing shell">
       <div class="hero-copy">
-        <div class="eyebrow">TEXAS PRIVATE BUSINESS VALUATION</div>
-        <h1>What could your business <em>actually</em> sell for?</h1>
-        <p class="hero-sub">Get a confidential, Texas-market-adjusted estimate based on your earnings, industry, growth and business characteristics.</p>
+        <div class="eyebrow">TEXAS PRIVATE COMPANY VALUATION</div>
+        <h1>Know what your business may be worth <em>before</em> you enter a sale process.</h1>
+        <p class="hero-sub">A confidential, Texas-market-adjusted estimate built from earnings, industry benchmarks, growth and the business-quality factors buyers underwrite.</p>
+        <div class="model-status"><span>TBW Valuation Engine</span><i></i><span>Texas market calibrated</span><i></i><span>Methodology disclosed</span></div>
         <div class="hero-actions">
           <button class="primary large" data-action="start">Estimate My Business Value <span>→</span></button>
-          <span class="time-note">About 90 seconds · No obligation</span>
+          <span class="time-note">About 90 seconds · No personal contact info required</span>
         </div>
         <div class="trust-row">
           <div><strong>Texas focused</strong><span>Austin · DFW · Houston · San Antonio</span></div>
-          <div><strong>Data-backed</strong><span>Industry + transaction benchmark architecture</span></div>
+          <div><strong>Explainable methodology</strong><span>Earnings multiples + revenue reasonableness check</span></div>
           <div><strong>Private</strong><span>No contact info required for your estimate</span></div>
         </div>
       </div>
 
       <aside class="hero-card" aria-label="Sample valuation preview">
-        <div class="mini-label">SAMPLE TEXAS VALUATION</div>
+        <div class="hero-card-top"><div><div class="mini-label">SAMPLE TEXAS VALUATION</div><small>Illustrative private-company report</small></div><span class="report-badge">CONFIDENTIAL</span></div>
         <div class="sample-value">$2.7M <span>–</span> $3.2M</div>
         <div class="sample-caption">Estimated market range</div>
         <div class="range-line"><span></span><i></i></div>
@@ -146,14 +150,16 @@
       </div>
 
       <div id="step-calculating" class="step-card calculating hidden">
-        <div class="calc-orbit"><span></span><b>TBW</b></div>
+        <div class="calc-orbit"><span></span><img src="/assets/texas-business-worth-logo.jpg" alt="" width="54" height="50"></div>
         <div class="eyebrow">BUILDING YOUR TEXAS ESTIMATE</div>
         <h2>Analyzing your business…</h2>
+        <p class="calc-sub">Your valuation is being assembled from multiple checks rather than a single multiple.</p>
         <ul id="calcList">
-          <li class="active">Matching your industry</li>
-          <li>Applying Texas market calibration</li>
-          <li>Analyzing earnings and growth</li>
-          <li>Calculating valuation range</li>
+          <li class="active">Matching your industry and NAICS peer set</li>
+          <li>Calibrating Texas and metro benchmarks</li>
+          <li>Testing earnings against revenue</li>
+          <li>Weighting growth and marketability</li>
+          <li>Building your valuation range</li>
         </ul>
       </div>
     </section>
@@ -183,7 +189,7 @@
 
       <div id="refineCta" class="refine-cta">
         <div class="refine-score"><b>66%</b><span>refined</span></div>
-        <div><h3>Make your estimate more accurate.</h3><p>Five business-quality questions can materially change what a buyer is likely to pay.</p></div>
+        <div><h3>Make your estimate more accurate.</h3><p>Add your business details and five quality factors buyers commonly underwrite.</p></div>
         <button class="primary" id="refineButton">Refine My Estimate →</button>
       </div>
 
@@ -221,14 +227,23 @@
       <div class="wizard-top">
         <button class="text-button" id="refineBack" type="button">← Back to estimate</button>
         <div class="progress-wrap"><div class="progress-bar"><span style="width:80%"></span></div><div>Refining your estimate</div></div>
-        <div class="privacy-mini">No contact info required</div>
+        <div class="privacy-mini">No personal contact info required</div>
       </div>
       <div class="step-card">
         <div class="step-number">+</div>
         <div class="step-content">
           <div class="eyebrow">BUSINESS QUALITY</div>
-          <h2>Five details buyers care about.</h2>
-          <p>These help estimate transferability and earnings quality.</p>
+          <h2>Build the more complete estimate.</h2>
+          <p>Business identity stays confidential. These details make the report more useful if you later request a sale conversation.</p>
+
+          <div class="identity-panel">
+            <div class="identity-head"><span>CONFIDENTIAL BUSINESS DETAILS</span><small>Not shown publicly</small></div>
+            <div class="identity-fields">
+              <label>Business name<input id="businessName" class="text-input" maxlength="160" autocomplete="organization" placeholder="e.g. Hill Country Mechanical"></label>
+              <label>Business address<input id="businessAddress" class="text-input" maxlength="240" autocomplete="street-address" placeholder="Street, city, TX ZIP"></label>
+            </div>
+            <label class="target-price">Sale price you would seriously consider <span>optional</span><span class="money-input"><i>$</i><input id="targetSalePrice" inputmode="numeric" autocomplete="off" placeholder="3,000,000"></span><small>If blank, buyer-financing analysis uses the model's most-likely value.</small></label>
+          </div>
 
           <fieldset><legend>1. How much revenue is recurring or from repeat customers?</legend><div class="pill-row" data-field="recurring"><button data-value="none">Almost none</button><button data-value="low">Under 25%</button><button data-value="medium">25–50%</button><button data-value="high">50–75%</button><button data-value="very_high">75%+</button></div></fieldset>
           <fieldset><legend>2. What percentage of revenue comes from your largest customer?</legend><div class="pill-row" data-field="customerConcentration"><button data-value="under_10">Under 10%</button><button data-value="10_25">10–25%</button><button data-value="25_50">25–50%</button><button data-value="over_50">Over 50%</button></div></fieldset>
